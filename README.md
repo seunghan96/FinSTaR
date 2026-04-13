@@ -2,8 +2,6 @@
 
 <p align="center">
   <a href="https://arxiv.org/abs/2507.XXXXX"><img src="https://img.shields.io/badge/arXiv-2507.XXXXX-b31b1b.svg" alt="arXiv"></a>
-  <a href="https://huggingface.co/datasets/seunghanlee/FinTSR-Bench"><img src="https://img.shields.io/badge/%F0%9F%A4%97%20HuggingFace-Dataset-yellow" alt="Dataset"></a>
-  <a href="https://huggingface.co/seunghanlee/FinSTaR-7B"><img src="https://img.shields.io/badge/%F0%9F%A4%97%20HuggingFace-Model-blue" alt="Model"></a>
   <a href="https://opensource.org/licenses/Apache-2.0"><img src="https://img.shields.io/badge/License-Apache%202.0-green.svg" alt="License"></a>
 </p>
 
@@ -45,7 +43,7 @@ We define core capabilities of a Financial TSRM along two axes, forming a 2x2 ta
 ## Installation
 
 ```bash
-git clone https://github.com/seunghanlee/FinSTaR.git
+git clone https://github.com/<your-username>/FinSTaR.git
 cd FinSTaR
 pip install -r requirements.txt
 ```
@@ -61,15 +59,21 @@ pip install -r requirements.txt
 
 ## FinTSR-Bench
 
-### Download
+### Data Generation
+
+FinTSR-Bench is constructed from 250 S&P 500 stocks (2010-2025). To generate the benchmark from raw stock data:
 
 ```bash
-# Download benchmark data from HuggingFace
-huggingface-cli download seunghanlee/FinTSR-Bench --local-dir data/
+# Step 1: Generate QA pairs (10 tasks, ~3,500 samples each)
+python src/data_generation/generate_qa_10tasks.py \
+    --data_dir raw_stock_data/ \
+    --output_dir data/raw/ \
+    --samples_per_task 3500
 
-# Or generate from scratch (requires raw stock data)
-python src/data_generation/generate_qa_10tasks.py --output_dir data/raw
-python src/data_generation/prepare_final_data.py --input_dir data/raw --output_dir data/final
+# Step 2: Generate CoT annotations and prepare final data
+python src/data_generation/prepare_final_data.py \
+    --input_dir data/raw/ \
+    --output_dir data/
 ```
 
 ### Data Structure
@@ -80,8 +84,7 @@ data/
 ├── train_ao.json           # 35K samples (answer-only)
 ├── test_sft.json           # Test A: ID stocks, OOD period (10K)
 ├── test_b_ood_stock.json   # Test B: OOD stocks, ID period (10K)
-├── test_c_ood_stock_period.json  # Test C: OOD stocks + period (10K)
-└── ablation/               # LOCO, solo, data efficiency splits
+└── test_c_ood_stock_period.json  # Test C: OOD stocks + period (10K)
 ```
 
 ### Data Format
@@ -192,16 +195,6 @@ bash scripts/12_statistical_baselines.sh
 bash scripts/13_dl_baselines.sh
 ```
 
-Analysis notebooks for generating tables and figures are in `analysis/`.
-
----
-
-## Model Zoo
-
-| Model | Backbone | HuggingFace | Avg. (A/B/C) |
-|---|---|---|---|
-| FinSTaR-7B | TimeOmni-1-7B | [seunghanlee/FinSTaR-7B](https://huggingface.co/seunghanlee/FinSTaR-7B) | 78.9 / 78.3 / 78.1 |
-
 ---
 
 ## Project Structure
@@ -233,12 +226,7 @@ FinSTaR/
 │   ├── 02_cot_train_timeomni.sh     # FinSTaR training
 │   ├── 06_cot_eval_timeomni.sh      # FinSTaR evaluation
 │   └── ...
-├── analysis/                        # Jupyter notebooks
-│   ├── main_results.ipynb           # Main results & tables
-│   ├── loco_ablation.ipynb          # LOCO analysis
-│   ├── scenario_cot_effect.ipynb    # Scenario-Aware CoT analysis
-│   └── ...
-└── data/                            # FinTSR-Bench (download separately)
+└── data/                            # FinTSR-Bench (generate via src/data_generation/)
 ```
 
 ---
