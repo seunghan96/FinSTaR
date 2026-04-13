@@ -1,0 +1,39 @@
+# Data (heavy — download separately or generate via src/data_generation/)
+data/*.json
+data/ablation/
+
+# Checkpoints
+checkpoints/
+ckpts/
+
+# Results
+results/
+
+# Analysis & ablation notebooks (auxiliary)
+analysis/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+wandb/

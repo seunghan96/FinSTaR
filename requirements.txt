@@ -1,0 +1,8 @@
+numpy<2.0
+torch
+transformers
+vllm
+tqdm
+huggingface_hub
+soxr
+# yfinance

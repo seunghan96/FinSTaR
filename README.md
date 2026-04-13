@@ -1,0 +1,269 @@
+# FinSTaR: Toward Financial Time Series Reasoning with Structured Chain-of-Thought
+
+<p align="center">
+  <a href="https://arxiv.org/abs/2507.XXXXX"><img src="https://img.shields.io/badge/arXiv-2507.XXXXX-b31b1b.svg" alt="arXiv"></a>
+  <a href="https://huggingface.co/datasets/seunghanlee/FinTSR-Bench"><img src="https://img.shields.io/badge/%F0%9F%A4%97%20HuggingFace-Dataset-yellow" alt="Dataset"></a>
+  <a href="https://huggingface.co/seunghanlee/FinSTaR-7B"><img src="https://img.shields.io/badge/%F0%9F%A4%97%20HuggingFace-Model-blue" alt="Model"></a>
+  <a href="https://opensource.org/licenses/Apache-2.0"><img src="https://img.shields.io/badge/License-Apache%202.0-green.svg" alt="License"></a>
+</p>
+
+<p align="center">
+  <img src="assets/overview.png" width="85%">
+</p>
+
+**FinSTaR** (**Fin**ancial Time **S**eries **T**hinking **a**nd **R**easoning) is the first Time Series Reasoning Model (TSRM) designed specifically for the financial domain. It employs two structurally different chain-of-thought (CoT) strategies tailored to the epistemological properties of financial reasoning:
+
+- **Compute-in-CoT** for *assessment* tasks (deterministic, computable from observable prices)
+- **Scenario-Aware CoT** for *prediction* tasks (probabilistic, subject to unobservable factors)
+
+FinSTaR achieves **78.9%** overall accuracy on FinTSR-Bench, outperforming 15+ baselines spanning LLMs, TSRMs, and TS forecasting models.
+
+---
+
+## Overview
+
+### Four Capability Categories
+
+We define core capabilities of a Financial TSRM along two axes, forming a 2x2 taxonomy:
+
+|  | **Single-Stock** | **Multi-Stock** |
+|---|---|---|
+| **Assessment** | Drawdown, Volatility Regime, Trend Direction | Correlation |
+| **Prediction** | Event Response, Support/Resistance, Drawdown Recovery, Volatility Forecast | Relative Performance, Pair Convergence |
+
+### Key Results
+
+| Model | Assessment Avg. | Prediction Avg. | Overall |
+|---|---|---|---|
+| Qwen2.5-7B (zero-shot) | 53.5 | 50.3 | 51.6 |
+| TimeOmni-1-7B (zero-shot) | 48.3 | 53.2 | 51.3 |
+| Qwen2.5-7B (SFT w/ CoT) | 67.7 | 51.1 | 57.8 |
+| **FinSTaR (Ours)** | **95.0** | **68.2** | **78.9** |
+
+---
+
+## Installation
+
+```bash
+git clone https://github.com/seunghanlee/FinSTaR.git
+cd FinSTaR
+pip install -r requirements.txt
+```
+
+### Requirements
+- Python >= 3.10
+- PyTorch >= 2.1
+- Transformers >= 4.40
+- vLLM >= 0.4.0
+- 2x NVIDIA L40S (or equivalent, ~48GB VRAM each)
+
+---
+
+## FinTSR-Bench
+
+### Download
+
+```bash
+# Download benchmark data from HuggingFace
+huggingface-cli download seunghanlee/FinTSR-Bench --local-dir data/
+
+# Or generate from scratch (requires raw stock data)
+python src/data_generation/generate_qa_10tasks.py --output_dir data/raw
+python src/data_generation/prepare_final_data.py --input_dir data/raw --output_dir data/final
+```
+
+### Data Structure
+
+```
+data/
+├── train_cot.json          # 35K samples with CoT annotations
+├── train_ao.json           # 35K samples (answer-only)
+├── test_sft.json           # Test A: ID stocks, OOD period (10K)
+├── test_b_ood_stock.json   # Test B: OOD stocks, ID period (10K)
+├── test_c_ood_stock_period.json  # Test C: OOD stocks + period (10K)
+└── ablation/               # LOCO, solo, data efficiency splits
+```
+
+### Data Format
+
+Each sample follows the chat format:
+```json
+{
+  "task": "F1_drawdown",
+  "answer": "C",
+  "conversations": [
+    {"role": "user", "content": "You are analyzing the stock AAPL. Below are the daily closing prices (120 days): [...]"},
+    {"role": "assistant", "content": "<think>\nStep 1 — Find the peak price: ...\n</think>\n<answer>(C)</answer>"}
+  ],
+  "metadata": {"peak": 182.63, "current": 161.42, "drawdown": 0.116}
+}
+```
+
+---
+
+## Training
+
+### Quick Start
+
+```bash
+# Train FinSTaR (TimeOmni-1-7B backbone, LoRA, 4 epochs)
+accelerate launch --num_processes 2 --mixed_precision bf16 \
+    src/training/train.py \
+    --model_dir anton-hugging/TimeOmni-1-7B \
+    --train_file data/train_cot.json \
+    --output_dir checkpoints/finstar \
+    --lora_r 32 --lora_alpha 64 \
+    --batch_size 1 --grad_accum 16 \
+    --max_length 4096 --num_epochs 4 --lr 5e-5
+```
+
+### Training Configurations
+
+| Config | Backbone | CoT | Description |
+|---|---|---|---|
+| `02_cot_train_timeomni.sh` | TimeOmni-1-7B | Compute + Scenario | **FinSTaR** (main) |
+| `03_cot_train_qwen.sh` | Qwen2.5-7B | Compute + Scenario | SFT baseline (w/ CoT) |
+| `04_ao_train_timeomni.sh` | TimeOmni-1-7B | None (answer-only) | Ablation (w/o CoT) |
+| `05_ao_train_qwen.sh` | Qwen2.5-7B | None (answer-only) | SFT baseline (w/o CoT) |
+
+---
+
+## Evaluation
+
+### Zero-Shot Evaluation
+
+```bash
+# Evaluate any model zero-shot on FinTSR-Bench
+python src/evaluation/inference.py \
+    --model_dir anton-hugging/TimeOmni-1-7B \
+    --test_file data/test_sft.json \
+    --output_dir results/timeomni_zs_test_a
+
+python src/evaluation/get_score.py \
+    --result_file results/timeomni_zs_test_a/eval_results.json
+```
+
+### FinSTaR Evaluation
+
+```bash
+# Evaluate FinSTaR (LoRA adapter)
+python src/evaluation/inference.py \
+    --model_dir anton-hugging/TimeOmni-1-7B \
+    --lora_dir checkpoints/finstar/lora \
+    --test_file data/test_sft.json \
+    --output_dir results/finstar_test_a
+
+python src/evaluation/get_score.py \
+    --result_file results/finstar_test_a/eval_results.json
+```
+
+### Forecasting Baselines
+
+```bash
+# Statistical baselines (Last Value, MA, ETS, Drift, Momentum)
+bash scripts/12_statistical_baselines.sh
+
+# Deep learning baselines (PatchTST, DLinear, Chronos, etc.)
+bash scripts/13_dl_baselines.sh
+```
+
+---
+
+## Reproduce Paper Results
+
+Run the full pipeline in order:
+
+```bash
+# Step 1: Zero-shot baselines
+bash scripts/01_zs.sh
+
+# Step 2: Train FinSTaR
+bash scripts/02_cot_train_timeomni.sh
+
+# Step 3: Evaluate
+bash scripts/06_cot_eval_timeomni.sh
+
+# Step 4: Ablation studies
+bash scripts/04_ao_train_timeomni.sh
+bash scripts/08_ao_eval_timeomni.sh
+
+# Step 5: Forecasting baselines
+bash scripts/12_statistical_baselines.sh
+bash scripts/13_dl_baselines.sh
+```
+
+Analysis notebooks for generating tables and figures are in `analysis/`.
+
+---
+
+## Model Zoo
+
+| Model | Backbone | HuggingFace | Avg. (A/B/C) |
+|---|---|---|---|
+| FinSTaR-7B | TimeOmni-1-7B | [seunghanlee/FinSTaR-7B](https://huggingface.co/seunghanlee/FinSTaR-7B) | 78.9 / 78.3 / 78.1 |
+
+---
+
+## Project Structure
+
+```
+FinSTaR/
+├── README.md
+├── requirements.txt
+├── configs/
+│   └── accelerate_config.yaml      # Multi-GPU training config
+├── src/
+│   ├── data_generation/             # FinTSR-Bench construction
+│   │   ├── generate_qa_10tasks.py   # QA pair generation (10 tasks)
+│   │   ├── generate_cot.py          # Compute-in-CoT annotation
+│   │   ├── generate_compute_cot.py  # Extended CoT with computation
+│   │   ├── prepare_final_data.py    # Final data preparation
+│   │   ├── prepare_fair_data.py     # Fair evaluation data
+│   │   └── utils.py                 # Financial indicators & utilities
+│   ├── training/
+│   │   ├── train.py                 # LoRA SFT training
+│   │   ├── data_utils.py            # Dataset & prompt utilities
+│   │   └── train_utils.py           # Model loading & LoRA config
+│   └── evaluation/
+│       ├── inference.py             # Batch inference (vLLM)
+│       ├── get_score.py             # Metric computation
+│       └── utils.py                 # Evaluation helpers
+├── scripts/                         # Experiment shell scripts
+│   ├── 01_zs.sh                     # Zero-shot baselines
+│   ├── 02_cot_train_timeomni.sh     # FinSTaR training
+│   ├── 06_cot_eval_timeomni.sh      # FinSTaR evaluation
+│   └── ...
+├── analysis/                        # Jupyter notebooks
+│   ├── main_results.ipynb           # Main results & tables
+│   ├── loco_ablation.ipynb          # LOCO analysis
+│   ├── scenario_cot_effect.ipynb    # Scenario-Aware CoT analysis
+│   └── ...
+└── data/                            # FinTSR-Bench (download separately)
+```
+
+---
+
+## Citation
+
+If you find this work useful, please cite:
+
+```bibtex
+@article{lee2025finstar,
+  title={FinSTaR: Toward Financial Time Series Reasoning with Structured Chain-of-Thought},
+  author={Lee, Seunghan and others},
+  journal={arXiv preprint arXiv:2507.XXXXX},
+  year={2025}
+}
+```
+
+---
+
+## Acknowledgements
+
+FinSTaR builds upon [TimeOmni-1](https://arxiv.org/abs/2509.24803) as its backbone. We thank the TimeOmni team for releasing model weights. Stock price data is sourced from publicly available S&P 500 historical data.
+
+---
+
+## License
+
+This project is licensed under the [Apache License 2.0](LICENSE).
