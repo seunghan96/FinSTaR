@@ -1,4 +1,4 @@
-# FinSTaR: Toward Financial Time Series Reasoning with Structured Chain-of-Thought
+# FinSTaR: Towards Financial Reasoning with Time Series Reasoning Models
 
 <p align="center">
   <a href="https://arxiv.org/pdf/2605.03460"><img src="https://img.shields.io/badge/arXiv-2605.03460-b31b1b.svg" alt="arXiv"></a>
@@ -213,7 +213,7 @@ If you find this work useful, please cite:
 
 ```bibtex
 @article{lee2026finstar,
-  title={FinSTaR: Toward Financial Time Series Reasoning with Structured Chain-of-Thought},
+  title={FinSTaR: Towards Financial Reasoning with Time Series Reasoning Models},
   author={Lee, Seunghan and Seo, Jun and Lee, Jaehoon and Yoo, Sungdong and Kim, Minjae and Lim, Tae Yoon and Kang, Dongwan and Choi, Hwanil and Lee, SoonYoung and Ahn, Wonbin},
   journal={arXiv preprint arXiv:2605.03460},
   year={2026}
