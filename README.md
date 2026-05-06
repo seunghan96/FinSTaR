@@ -16,6 +16,8 @@
 
 FinSTaR achieves **78.9%** overall accuracy on FinTSR-Bench, outperforming 15+ baselines spanning LLMs, TSRMs, and TS forecasting models.
 
+<br>
+
 ---
 
 ## Overview
@@ -38,22 +40,19 @@ We define core capabilities of a Financial TSRM along two axes, forming a 2x2 ta
 | Qwen2.5-7B (SFT w/ CoT) | 67.7 | 51.1 | 57.8 |
 | **FinSTaR (Ours)** | **95.0** | **68.2** | **78.9** |
 
+<br>
+
 ---
 
 ## Installation
 
 ```bash
-git clone https://github.com/<your-username>/FinSTaR.git
+git clone https://github.com/seunghan96/FinSTaR.git
 cd FinSTaR
 pip install -r requirements.txt
 ```
 
-### Requirements
-- Python >= 3.10
-- PyTorch >= 2.1
-- Transformers >= 4.40
-- vLLM >= 0.4.0
-- 2x NVIDIA L40S (or equivalent, ~48GB VRAM each)
+<br>
 
 ---
 
@@ -102,6 +101,8 @@ Each sample follows the chat format:
 }
 ```
 
+<br>
+
 ---
 
 ## Training
@@ -129,6 +130,8 @@ accelerate launch --num_processes 2 --mixed_precision bf16 \
 | `04_ao_train_timeomni.sh` | TimeOmni-1-7B | None (answer-only) | Ablation (w/o CoT) |
 | `05_ao_train_qwen.sh` | Qwen2.5-7B | None (answer-only) | SFT baseline (w/o CoT) |
 
+<br>
+
 ---
 
 ## Evaluation
@@ -141,9 +144,6 @@ python src/evaluation/inference.py \
     --model_dir anton-hugging/TimeOmni-1-7B \
     --test_file data/test_sft.json \
     --output_dir results/timeomni_zs_test_a
-
-python src/evaluation/get_score.py \
-    --result_file results/timeomni_zs_test_a/eval_results.json
 ```
 
 ### FinSTaR Evaluation
@@ -155,9 +155,6 @@ python src/evaluation/inference.py \
     --lora_dir checkpoints/finstar/lora \
     --test_file data/test_sft.json \
     --output_dir results/finstar_test_a
-
-python src/evaluation/get_score.py \
-    --result_file results/finstar_test_a/eval_results.json
 ```
 
 ### Forecasting Baselines
@@ -170,30 +167,7 @@ bash scripts/12_statistical_baselines.sh
 bash scripts/13_dl_baselines.sh
 ```
 
----
-
-## Reproduce Paper Results
-
-Run the full pipeline in order:
-
-```bash
-# Step 1: Zero-shot baselines
-bash scripts/01_zs.sh
-
-# Step 2: Train FinSTaR
-bash scripts/02_cot_train_timeomni.sh
-
-# Step 3: Evaluate
-bash scripts/06_cot_eval_timeomni.sh
-
-# Step 4: Ablation studies
-bash scripts/04_ao_train_timeomni.sh
-bash scripts/08_ao_eval_timeomni.sh
-
-# Step 5: Forecasting baselines
-bash scripts/12_statistical_baselines.sh
-bash scripts/13_dl_baselines.sh
-```
+<br>
 
 ---
 
@@ -229,6 +203,8 @@ FinSTaR/
 └── data/                            # FinTSR-Bench (generate via src/data_generation/)
 ```
 
+<br>
+
 ---
 
 ## Citation
@@ -236,22 +212,17 @@ FinSTaR/
 If you find this work useful, please cite:
 
 ```bibtex
-@article{lee2025finstar,
+@article{lee2026finstar,
   title={FinSTaR: Toward Financial Time Series Reasoning with Structured Chain-of-Thought},
-  author={Lee, Seunghan and others},
-  journal={arXiv preprint arXiv:2507.XXXXX},
-  year={2025}
+  author={Lee, Seunghan and Seo, Jun and Lee, Jaehoon and Yoo, Sungdong and Kim, Minjae and Lim, Tae Yoon and Kang, Dongwan and Choi, Hwanil and Lee, SoonYoung and Ahn, Wonbin},
+  journal={arXiv preprint arXiv:2605.03460},
+  year={2026}
 }
 ```
 
----
 
 ## Acknowledgements
 
-FinSTaR builds upon [TimeOmni-1](https://arxiv.org/abs/2509.24803) as its backbone. We thank the TimeOmni team for releasing model weights. Stock price data is sourced from publicly available S&P 500 historical data.
+FinSTaR builds upon [TimeOmni-1](https://arxiv.org/abs/2509.24803) as its backbone. 
+We thank the TimeOmni team for releasing model weights. Stock price data is sourced from publicly available S&P 500 historical data.
 
----
-
-## License
-
-This project is licensed under the [Apache License 2.0](LICENSE).
