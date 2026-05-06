@@ -233,3 +233,8 @@ If you find this work useful, please cite:
 FinSTaR builds upon [TimeOmni-1](https://arxiv.org/abs/2509.24803) as its backbone. 
 We thank the TimeOmni team for releasing model weights. Stock price data is sourced from publicly available S&P 500 historical data.
 
+## Contact
+
+Seunghan Lee — seunghan.lee@lgresearch.ai
+
+
