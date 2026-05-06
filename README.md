@@ -6,7 +6,7 @@
 </p>
 
 <p align="center">
-  <img src="assets/overview.png" width="85%">
+  <img src="assets/finstar_main.png" width="85%">
 </p>
 
 **FinSTaR** (**Fin**ancial Time **S**eries **T**hinking **a**nd **R**easoning) is the first Time Series Reasoning Model (TSRM) designed specifically for the financial domain. It employs two structurally different chain-of-thought (CoT) strategies tailored to the epistemological properties of financial reasoning:
