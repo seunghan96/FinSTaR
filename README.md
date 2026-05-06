@@ -1,22 +1,18 @@
 # FinSTaR: Towards Financial Reasoning with Time Series Reasoning Models
 
+
 <p align="center">
   <a href="https://arxiv.org/pdf/2605.03460"><img src="https://img.shields.io/badge/arXiv-2605.03460-b31b1b.svg" alt="arXiv"></a>
   <a href="https://opensource.org/licenses/Apache-2.0"><img src="https://img.shields.io/badge/License-Apache%202.0-green.svg" alt="License"></a>
 </p>
 
-<p align="center">
-  <img src="assets/finstar_main.png" width="85%">
-</p>
+**FinSTaR** (**Fin**ancial Time **S**eries **T**hinking **a**nd **R**easoning) is the first Time Series Reasoning Model (TSRM) designed specifically for the financial domain. It employs two structurally different chain-of-thought (CoT) strategies tailored to the properties of financial reasoning:
 
-**FinSTaR** (**Fin**ancial Time **S**eries **T**hinking **a**nd **R**easoning) is the first Time Series Reasoning Model (TSRM) designed specifically for the financial domain. It employs two structurally different chain-of-thought (CoT) strategies tailored to the epistemological properties of financial reasoning:
-
-- **Compute-in-CoT** for *assessment* tasks (deterministic, computable from observable prices)
-- **Scenario-Aware CoT** for *prediction* tasks (probabilistic, subject to unobservable factors)
-
-FinSTaR achieves **78.9%** overall accuracy on FinTSR-Bench, outperforming 15+ baselines spanning LLMs, TSRMs, and TS forecasting models.
+- (1) **Compute-in-CoT** for *assessment* tasks (deterministic, computable from observable prices)
+- (2) **Scenario-Aware CoT** for *prediction* tasks (probabilistic, subject to unobservable factors)
 
 <br>
+
 
 ---
 
@@ -26,10 +22,21 @@ FinSTaR achieves **78.9%** overall accuracy on FinTSR-Bench, outperforming 15+ b
 
 We define core capabilities of a Financial TSRM along two axes, forming a 2x2 taxonomy:
 
+<br> 
+
+<p align="center">
+  <img src="assets/finstar_main.png" width="55%">
+</p>
+
+<br> 
+
 |  | **Single-Stock** | **Multi-Stock** |
 |---|---|---|
 | **Assessment** | Drawdown, Volatility Regime, Trend Direction | Correlation |
 | **Prediction** | Event Response, Support/Resistance, Drawdown Recovery, Volatility Forecast | Relative Performance, Pair Convergence |
+
+
+<br>
 
 ### Key Results
 
