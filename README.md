@@ -1,7 +1,7 @@
 # FinSTaR: Toward Financial Time Series Reasoning with Structured Chain-of-Thought
 
 <p align="center">
-  <a href="https://arxiv.org/abs/2507.XXXXX"><img src="https://img.shields.io/badge/arXiv-2507.XXXXX-b31b1b.svg" alt="arXiv"></a>
+  <a href="https://arxiv.org/pdf/2605.03460"><img src="https://img.shields.io/badge/arXiv-2605.03460-b31b1b.svg" alt="arXiv"></a>
   <a href="https://opensource.org/licenses/Apache-2.0"><img src="https://img.shields.io/badge/License-Apache%202.0-green.svg" alt="License"></a>
 </p>
 
