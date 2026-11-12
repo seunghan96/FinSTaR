@@ -1,15 +1,34 @@
-# FinSTaR: Towards Financial Reasoning with Time Series Reasoning Models
+<div align="center">
 
+# FinSTaR: Towards Financial Reasoning<br>with Time Series Reasoning Models
 
-<p align="center">
-  <a href="https://arxiv.org/pdf/2605.03460"><img src="https://img.shields.io/badge/arXiv-2605.03460-b31b1b.svg" alt="arXiv"></a>
-  <a href="https://opensource.org/licenses/Apache-2.0"><img src="https://img.shields.io/badge/License-Apache%202.0-green.svg" alt="License"></a>
-</p>
+<a href="https://arxiv.org/abs/2605.03460"><img src="https://img.shields.io/badge/EMNLP%202026-Industry%20Track-0a7ea4.svg" alt="EMNLP 2026 Industry Track"></a>
+<a href="https://arxiv.org/abs/2605.03460"><img src="https://img.shields.io/badge/KDD%202026%20Workshop-Oral-7b2cbf.svg" alt="KDD 2026 Workshop, Oral"></a>
+<a href="https://arxiv.org/abs/2605.03460"><img src="https://img.shields.io/badge/arXiv-2605.03460-b31b1b.svg?logo=arxiv&logoColor=white" alt="arXiv"></a>
+<a href="https://arxiv.org/pdf/2605.03460"><img src="https://img.shields.io/badge/Paper-PDF-red.svg" alt="Paper PDF"></a>
+<a href="https://opensource.org/licenses/Apache-2.0"><img src="https://img.shields.io/badge/License-Apache%202.0-green.svg" alt="License"></a>
+
+Seunghan Lee, Jun Seo, Jaehoon Lee, Sungdong Yoo, Minjae Kim,<br>
+Tae Yoon Lim, Dongwan Kang, Hwanil Choi, SoonYoung Lee, Wonbin Ahn
+
+LG AI Research
+
+</div>
+
+Official code for the paper
+[*FinSTaR: Towards Financial Reasoning with Time Series Reasoning Models*](https://arxiv.org/abs/2605.03460),
+accepted to the **EMNLP 2026 Industry Track**. A preliminary version was presented at a **KDD 2026 Workshop** as an **Oral**.
+
+---
 
 **FinSTaR** (**Fin**ancial Time **S**eries **T**hinking **a**nd **R**easoning) is the first Time Series Reasoning Model (TSRM) designed specifically for the financial domain. It employs two structurally different chain-of-thought (CoT) strategies tailored to the properties of financial reasoning:
 
 - (1) **Compute-in-CoT** for *assessment* tasks (deterministic, computable from observable prices)
 - (2) **Scenario-Aware CoT** for *prediction* tasks (probabilistic, subject to unobservable factors)
+
+<p align="center">
+  <img src="assets/finstar_cot.png" width="85%" alt="The two CoT strategies: Compute-in-CoT on a drawdown assessment task and Scenario-Aware CoT on a prediction task.">
+</p>
 
 <br>
 
@@ -46,6 +65,16 @@ We define core capabilities of a Financial TSRM along two axes, forming a 2x2 ta
 | TimeOmni-1-7B (zero-shot) | 48.3 | 53.2 | 51.3 |
 | Qwen2.5-7B (SFT w/ CoT) | 67.7 | 51.1 | 57.8 |
 | **FinSTaR (Ours)** | **95.0** | **68.2** | **78.9** |
+
+<br>
+
+### Qualitative Comparison
+
+Baselines either fail to compute precise quantities or default to heuristic reasoning, while FinSTaR's CoT produces grounded, step-by-step reasoning.
+
+<p align="center">
+  <img src="assets/finstar_qualitative.png" width="100%" alt="Two examples where Qwen2.5-7B and TimeOmni-1 answer incorrectly and FinSTaR answers correctly with step-by-step reasoning.">
+</p>
 
 <br>
 
@@ -219,10 +248,10 @@ FinSTaR/
 If you find this work useful, please cite:
 
 ```bibtex
-@article{lee2026finstar,
+@inproceedings{lee2026finstar,
   title={FinSTaR: Towards Financial Reasoning with Time Series Reasoning Models},
   author={Lee, Seunghan and Seo, Jun and Lee, Jaehoon and Yoo, Sungdong and Kim, Minjae and Lim, Tae Yoon and Kang, Dongwan and Choi, Hwanil and Lee, Soonyoung and Ahn, Wonbin},
-  journal={EMNLP Industry Track},
+  booktitle={Proceedings of the 2026 Conference on Empirical Methods in Natural Language Processing: Industry Track},
   year={2026}
 }
 ```
